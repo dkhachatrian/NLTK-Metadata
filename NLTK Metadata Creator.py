@@ -31,7 +31,7 @@ from nltk.corpus import wordnet as wn
 #keywords = [] #will be built from words given by authors
 with open('Keywords.txt', 'r') as kw:
     keywords = hf.build_keywords_from_file(kw)
-expanded_keywords = {}
+expanded_keywords = hf.build_expanded_keywords(keywords)
                 
 text_file = os.path.join(dname, 'test.txt')
 #first_names = nltk.corpus.names.words() # first names corpus, as a list, if necessary
@@ -44,7 +44,8 @@ with open(text_file, 'r') as f:
 	people = line.get_people()
 	
         for noun in nouns:
-            if noun in keywords or hf.is_in_container(noun, expanded_keywords):
+            loc_info = hf.in_container(noun, expanded_keywords) # gives a tuple, (the element in which
+            if noun in keywords or loc_info != (None, -1):
                 pass
                 
 
