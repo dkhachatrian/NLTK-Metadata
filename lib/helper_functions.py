@@ -13,7 +13,6 @@ class Line:
         """Returns the nouns in Line as a list."""
         return [w[0] for w in self.tagged if 'NN' in w[1]] #list of nouns in line (second entry in tuple gives tag)
 
-
     def get_people(self):
         """Returns the names of the people in that line as a list of strings."""
     
@@ -67,23 +66,37 @@ def clean_list_of_people(l,s):
        
     return result
 
-def is_in_container(e, c, n = 0):
+def in_container(e, c, n = 0):
     """ Takes an entry to search for and a container, which may contain containers.
-    Returns the most shallow subcontainer and the number of levels deep in the subcontainer the entry is located.
+    Returns the index in the main container which holds the entry and the number of levels deep in the subcontainer the entry is located.
+    (For example cases, see below.)
     If entry not found, returns (None, -1). """
     
-    #breadth first
-    #list_of_types =
+    #Examples: for li = ['albert', ['brenda', 'carl'], 'david', [['evelyn']]]
+    #in_container('david', li) should return (3, 0).
+    #in_container('evelyn', li) should return (4, 2).
+    #in_container('jonathan', li) should return (None, -1).
     
-    for x in range(len(c)): #first check current level
-        if e == c[x]:
-            return (c[x], n)
+    #breadth first, hence the separate for loops
+    #list_of_types
     
-    if type(c) is list or type(c) is dict:
-        is_in_container(e, c[x], n + 1)
+    #first check current level
+    if type(c) is list:
+        for x in range(len(c)):
+            if e == c[x]:
+                return (x, n)
+    elif type(c) is dict:
+        for entry in c:
+            if e == entry:
+                return(x, n)
     
-    else:
-        return (None, -1)
+    for x in range(len(c)):
+        if type(c[x]) is list or type(c[x]) is dict:
+            t = in_container(e, c[x], n + 1)
+            if t != (None, -1):
+                return (x, t[1])
+            else:
+                return (None, -1)
             
                                                 
 def build_keywords_from_file(f):
@@ -92,13 +105,16 @@ def build_keywords_from_file(f):
     pass #waiting on file to see how to parse
 
 
-def build_expanded_keywords(l, d):
+def build_expanded_keywords(l):
     """ Takes in the list of keywords (l).
     Uses Wordnet from NLTK package to build a dictionary (d) of synonyms to go along with each word.
+    d will be a dictionary whose values are lists of strings.
     """
     #from nltk import corpus
     # keywords == l
     # expanded_keywords == d
+
+    d = {}
 
     for word in l:
     #    if is_in_container(word, expanded_keywords) == True: #if already covered in synonyms of a similar word, likely not needed (?)
