@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ### Helper functions for metadata creation ###
 from nltk.corpus import wordnet as wn
 import nltk
@@ -12,12 +13,20 @@ class Line:
     def get_nouns(self):
         """Returns the nouns in Line as a list."""
         return [w[0] for w in self.tagged if 'NN' in w[1]] #list of nouns in line (second entry in tuple gives tag)
-
+        
+    def get_proper_nouns(self):
+        """Returns the nouns in Line as a list."""
+        excluded = ['(',')'] #unwanted in list. Parentheses are tagged with 'NNP'
+        return [n[0] for n in self.tagged if ('NNP' in n[1] and n[0] not in excluded and n[0][0].isupper())] #list of nouns in line (second entry in tuple gives tag)
+        #checks to see if it's tagged with 'NNP', isn't a paren, and is capitalized
+        
     def get_people(self):
         """Returns the names of the people in that line as a list of strings."""
-    
-        treeList = list(self.entities.subtrees(lambda t: t.label() == 'PERSON')) #argument provided to subtree serves as filter (by label)
-        return clean_list_of_people(treeList, self.raw_text)
+        excluded = ['(',')'] #unwanted in list. Parentheses are tagged with 'NNP'
+        tuples = [n for n in self.tagged if ('NNP' in n[1] and n[0] not in excluded and n[0][0].isupper())] #list of nouns in line (second entry in tuple gives tag)
+        #checks to see if it's tagged with 'NNP', isn't a paren, and is capitalized
+
+        return clean_list_of_people(tuples, self.raw_text)
 
     def get_chapter_num(self):
         """Takes in a string. Returns as a string, if existent, the number
@@ -36,8 +45,22 @@ class Line:
         return self[x:y]
 
 
+
+#def tree_to_list(t, l):
+#    """Takes in an object that may be a tree, and an empty list l.
+#    If object is a tree, returns the tree and its subtrees as lists in l. Otherwise return object unchanged."""
+#    
+#    if type(t) is nltk.Tree:
+#        if len(t) == 1 and type(t[0]) == tuple:
+#            l.append(list(t))
+#        elif len(t) == 0:
+#            return []
+#        else:
+#            for st in t.subtrees(lambda t: t.height() == 2): #Trees are iterable over their children
+#                tree_to_list(t)
+
 def clean_list_of_people(l,s):
-    """Takes in a list of people and the original line. Checks that they're chunked properly.
+    """Takes in a list of tuples marked as proper nouns, and the original line. Checks that they're chunked properly.
     If any Persons only have a first name, uses the original line to check if improperly chunked.
     Returns a checked list of strings, each string corresponding to a person's name."""
     
@@ -46,25 +69,29 @@ def clean_list_of_people(l,s):
     if len(l) == 0:
         return result
     
-    for x in range(len(l)): #l is main tree of all people
+    for x in range(len(l)):
         temp = []
         #l[x] is a singular person's name in tuples along with position tag. l[x][y][0] gives the y'th part of the name.
-        if len(l[x]) == 1: #if it couldn't find a last name,
-            i = 0
-            temp.append(l[x+i][0][0]) #first word...
-            while x + i + 1 < len(l) and len(l[x]) == 1: #while the next "Persons" after them also only have one part of a name
-                if abs(len(l[x+i+1][0][0]) - s.index(l[x + i][0][0]) + len(l[x+i][0][0])) == 1 : #if the distance between the two "Persons" is less than one char away (i.e. there's a ' ' between the two)
-                    temp.append(l[x+i+1][0][0]) #add the consecutive words...
-            
-        elif len(l[x]) > 1: #if it isn't an oddity
-            for y in range(l[x]):
-                temp.append(l[x][y][0]) #add all the parts of the name. Parts of the name are controlled by second index y. String of interest in 0th index.
-        
-        stemp = set(temp) #should only really be necessary to do for first case...
-        t = ' '.join(stemp)
-        result.append(t)
+        i = 0
+        temp.append(l[x+i][0]) #first word...
+        while x + i + 1 < len(l): #while the next "Persons" after them also only have one part of a name
+            dist = abs(len(l[x+i+1][0]) - s.index(l[x + i][0]) - len(l[x+i][0]))
+            if dist == 1 : #if the distance between the two "Persons" is less than one char away (i.e. there's a ' ' between the two)
+                temp.append(l[x+i+1][0]) #add the consecutive words...
+                i += 1 #increment i
+            else:
+                break
+        x += i #update x after matching together string    
+
+        if len(temp) > 1: #if there were a set of words in a row,
+            t = ' '.join(temp)
+            result.append(t)
        
     return result
+
+### Test Cases... ###
+#clean_list_of_people("""        """)
+#clean_list_of_people("""        """)
 
 def in_container(e, c, n = 0):
     """ Takes an entry to search for and a container, which may contain containers.
