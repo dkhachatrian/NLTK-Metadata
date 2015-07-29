@@ -23,10 +23,10 @@ class Line:
     def get_people(self):
         """Returns the names of the people in that line as a list of strings."""
         excluded = ['(',')'] #unwanted in list. Parentheses are tagged with 'NNP'
-        tuples = [n for n in self.tagged if ('NNP' in n[1] and n[0] not in excluded and n[0][0].isupper())] #list of nouns in line (second entry in tuple gives tag)
+        nnp = [n[0] for n in self.tagged if ('NNP' in n[1] and n[0] not in excluded and n[0][0].isupper())] #list of nouns in line (second entry in tuple gives tag)
         #checks to see if it's tagged with 'NNP', isn't a paren, and is capitalized
 
-        return clean_list_of_people(tuples, self.raw_text)
+        return clean_list_of_people(nnp, self.raw_text)
 
     def get_chapter_num(self):
         """Takes in a string. Returns as a string, if existent, the number
@@ -60,7 +60,7 @@ class Line:
 #                tree_to_list(t)
 
 def clean_list_of_people(l,s):
-    """Takes in a list of tuples marked as proper nouns, and the original line. Checks that they're chunked properly.
+    """Takes in a list of strings that were marked as proper nouns, and the original line. Checks that they're chunked properly.
     If any Persons only have a first name, uses the original line to check if improperly chunked.
     Returns a checked list of strings, each string corresponding to a person's name."""
     
@@ -73,16 +73,16 @@ def clean_list_of_people(l,s):
         temp = []
         #l[x] is a singular person's name in tuples along with position tag. l[x][y][0] gives the y'th part of the name.
         i = 0
-        temp.append(l[x+i][0]) #first word...
+        temp.append(l[x+i]) #first word...
         while x + i + 1 < len(l): #while the next "Persons" after them also only have one part of a name
-            dist = abs(len(l[x+i+1][0]) - s.index(l[x + i][0]) - len(l[x+i][0]))
-            if dist == 1 : #if the distance between the two "Persons" is less than one char away (i.e. there's a ' ' between the two)
-                temp.append(l[x+i+1][0]) #add the consecutive words...
+            dist = abs(s.find(l[x+i]) + len(l[x+i]) - s.find(l[x+i+1]))
+            if dist == 1: #if the distance between the two "Persons" is less than one char away (i.e. there's a ' ' between the two)
+                temp.append(l[x+i+1]) #add the consecutive words...
                 i += 1 #increment i
             else:
                 break
         x += i #update x after matching together string    
-
+        
         if len(temp) > 1: #if there were a set of words in a row,
             t = ' '.join(temp)
             result.append(t)
