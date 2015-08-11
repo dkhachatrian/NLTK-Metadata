@@ -2,6 +2,8 @@
 ### Helper functions for metadata creation ###
 from nltk.corpus import wordnet as wn
 import nltk
+import shared as g
+#IGNORE_CHAR = '#'
 
 class Line:
     def __init__(self, s = ''):
@@ -89,10 +91,6 @@ def clean_list_of_people(l,s):
        
     return result
 
-### Test Cases... ###
-#clean_list_of_people("""        """)
-#clean_list_of_people("""        """)
-
 def in_container(e, c, n = 0):
     """ Takes an entry to search for and a container, which may contain containers.
     Returns the index in the main container which holds the entry and the number of levels deep in the subcontainer the entry is located.
@@ -126,16 +124,42 @@ def in_container(e, c, n = 0):
                 return (None, -1)
             
                                                 
-def build_keywords_from_file(f):
-    """ Takes in a file (f) containing keywords.
-    Returns a list of said keywords."""
-    pass #waiting on file to see how to parse
+def build_keywords_from_file(f, l):
+    """ Takes in a file (f) containing keywords and a list (l) that may or may not be empty.
+    Returns a list of said keywords as lemmas recognized by WordNet (if applicable),
+    checking to see that there are no duplicates in the list."""
+    wnl = nltk.WordNetLemmatizer()
+    
+    for line in f:
+        if line.startswith(g.IGNORE_SEQ):
+            continue
+        
+        nLine = Line(line)
+        nouns = nLine.get_nouns()
+        lwc = [noun.lower() for noun in nouns]
+        s = set(lwc)
+        
+        lemmas = [wnl.lemmatize(t) for t in s]
+        for lemma in lemmas:
+#            loc_info = in_container(noun, l) # gives a tuple, (the element in which
+#            if noun in l or loc_info != (None, -1):
+#                pass
+#            else:
+            if lemma not in l:
+                l.append(lemma)
+    return l
+    
+    #
+        
+      
+    #pass #waiting on file to see how to parse
 
 
 def build_expanded_keywords(l):
     """ Takes in the list of keywords (l).
     Uses Wordnet from NLTK package to build a dictionary (d) of synonyms to go along with each word.
     d will be a dictionary whose values are lists of strings.
+    If WordNet does not recognize the word as a lemma, the corresponding value will be the empty list, [].
     """
     #from nltk import corpus
     # keywords == l
@@ -156,4 +180,4 @@ def build_expanded_keywords(l):
                 if entry not in d[word]: #keep list shorter so later searching is quicker
                     d[word].append(entry)
 
-                
+    return d
