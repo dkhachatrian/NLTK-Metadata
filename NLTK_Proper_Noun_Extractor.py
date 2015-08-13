@@ -12,6 +12,7 @@ os.chdir(dname)
 import codecs  #Python 2
 from lib import helper_functions as hf
 import kitchen.text.converters as k
+from lib import shared as g
 
 #with codecs.open("Scaloria Figure Captions.txt", 'r', encoding = 'utf-8') as f:    #Python 2
 with codecs.open("Cleaned Captions.txt", 'r', encoding = 'utf-8') as f:
@@ -26,12 +27,12 @@ with codecs.open("Cleaned Captions.txt", 'r', encoding = 'utf-8') as f:
                     people = s.get_people()
 
                     if len(proper_nouns) > 0:
-                                w.write("List of capitalized phrases found in " + line.split()[0] + " are the following: " + '\n')
+                                w.write(g.IGNORE_SEQ + "List of capitalized phrases found in " + line.split()[0] + " are the following: " + '\n')
                                 for noun in proper_nouns:
                                     w.write(noun + '\t')
-                                w.write('\n' + "And the people found in this caption are the following: " + '\n')
+                                w.write('\n' + g.IGNORE_SEQ + "And the people found in this caption are the following: " + '\n')
                                 for person in people:
-                                    w.write(person + '\t')
+                                    w.write(person + '; ')
                                 ##debugging...
                                 #w.write("Corresponding tuples:" + '\n')
                                 #for tup in all_tuples:
