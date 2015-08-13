@@ -28,7 +28,13 @@ class Line:
         nnp = [n[0] for n in self.tagged if ('NNP' in n[1] and n[0] not in excluded and n[0][0].isupper())] #list of nouns in line (second entry in tuple gives tag)
         #checks to see if it's tagged with 'NNP', isn't a paren, and is capitalized
 
-        return clean_list_of_people(nnp, self.raw_text)
+        return consolidate_tokens(nnp, self.raw_text)
+        
+    def get_content_tuples(self):
+        """Returns a list of tuples (word, tag), with all adjectives, verbs, and nouns in the line."""
+        excluded = ['(',')']
+        toi = ['NN', 'VB', 'JJ'] #tags of interest: noun, verb, adjective
+        return [w for w in self.tagged if (len(w[1])>1 and w[1][:2] in toi and w[0] not in excluded)]
 
     def get_chapter_num(self):
         """Takes in a string. Returns as a string, if existent, the number
@@ -61,8 +67,8 @@ class Line:
 #            for st in t.subtrees(lambda t: t.height() == 2): #Trees are iterable over their children
 #                tree_to_list(t)
 
-def clean_list_of_people(l,s):
-    """Takes in a list of strings that were marked as proper nouns, and the original line. Checks that they're chunked properly.
+def consolidate_tokens(l,s):
+    """Takes in a list of strings, and the original line. Checks that they're chunked properly.
     If any Persons only have a first name, uses the original line to check if improperly chunked.
     Returns a checked list of strings, each string corresponding to a person's name."""
     
