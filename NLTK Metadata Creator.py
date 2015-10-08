@@ -30,18 +30,71 @@ from nltk.corpus import wordnet as wn
 
 #keywords = [] #will be built from words given by authors
 with open('Keywords.txt', 'r') as kw:
-    keywords = hf.build_keywords_from_file(kw)
+    keywords = hf.build_keywords_from_file(kw) 
 expanded_keywords = hf.build_expanded_keywords(keywords)
                 
 text_file = os.path.join(dname, 'test.txt')
 #first_names = nltk.corpus.names.words() # first names corpus, as a list, if necessary
 
+
+#now that I have the expanded keywords, a list of list of strings,
+#we can see whether these words are found in a line. 
+
+
+#Now let's create our file and our header (some boilerplate from before...)
+
+
+
+##### COPYPASTA #####
+
+
+###############################################
+######### A bunch of declarations...###########
+###############################################
+
+#Worth noting: when writing to file, will need to convert strings to bytes using bytes(string, encoding scheme)
+
+DELIMITER = '\t'  #will be tab-separated
+IN_CELL_DELIMITER = ',' #when phrases need to be differentiated within a cell in the CSV
+PERSONS_MAX = 10 #total number of people of a specific type, e.g. Creator or Author, in a row. Determined by Metadata Fields.txt.
+                #To simplify code, all the different types of people have the same max.
+
+excelHeader = ""
+metadataFields = [] #list
+
+with open("Metadata Fields.txt", 'r') as mf:
+        #may want to change the wording of the below lines, would mess up if there were more than one line
+        for line in mf: #should only be the one line with column headers
+                metadataFields = line.split('\t') #splits into list using comma as delimiter (for .csv)
+        for entry in metadataFields:
+                excelHeader = excelHeader + entry + DELIMITER
+#        for line in mf:
+#                metadataFields.append(line[:-1])    #line[:-1] removes '\n' from line
+#                excelHeader = excelHeader + line[:-1] + DELIMITER
+        #excelHeader has extra \t at end
+        excelHeader = excelHeader[0:-1] #cut off last \t
+        #excelHeader does NOT have a \n at the end
+
+
+####
+
+#####
+########
+#########
+#########   Now for each line, let's see if I can find the words of interest in my extended keywords
+#########   If I can, look up that word in our list of associations (TODO: set up list of associations)
+#########   and then spit it out for the field...
+
+
 with open(text_file, 'r') as f:
     for fline in f:
         line = hf.Line(fline)
-	cNum = line.get_chapter_num()
-	nouns = line.get_nouns()
-	people = line.get_people()
+        
+        hf.
+        
+        cNum = line.get_chapter_num()
+        nouns = line.get_nouns()
+        people = line.get_people()
 	
         for noun in nouns:
             loc_info = hf.in_container(noun, expanded_keywords) # gives a tuple, (the element in which
@@ -75,35 +128,4 @@ with open(text_file, 'r') as f:
 
 
 
-
-
-
-##### COPYPASTA #####
-
-
-###############################################
-######### A bunch of declarations...###########
-###############################################
-
-#Worth noting: when writing to file, will need to convert strings to bytes using bytes(string, encoding scheme)
-
-DELIMITER = '\t'  #will be tab-separated
-IN_CELL_DELIMITER = ',' #when phrases need to be differentiated within a cell in the CSV
-PERSONS_MAX = 10 #total number of people of a specific type, e.g. Creator or Author, in a row. Determined by Metadata Fields.txt.
-                #To simplify code, all the different types of people have the same max.
-
-excelHeader = ""
-metadataFields = [] #list
-
-with open("Metadata_fields.csv", 'r') as mf:
-        for line in mf: #should only be the one line with column headers
-                metadataFields = line.split(',') #splits into list using comma as delimiter (for .csv)
-        for entry in metadataFields:
-                excelHeader = excelHeader + entry + DELIMITER
-#        for line in mf:
-#                metadataFields.append(line[:-1])    #line[:-1] removes '\n' from line
-#                excelHeader = excelHeader + line[:-1] + DELIMITER
-        #excelHeader has extra \t at end
-        excelHeader = excelHeader[0:-1] #cut off last \t
-        #excelHeader does NOT have a \n at the end
 
