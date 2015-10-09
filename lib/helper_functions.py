@@ -36,6 +36,8 @@ class Line:
         toi = ['NN', 'VB', 'JJ'] #tags of interest: noun, verb, adjective
         return [w for w in self.tagged if (len(w[1])>1 and w[1][:2] in toi and w[0] not in excluded)]
 
+
+
     def get_chapter_num(self):
         """Takes in a string. Returns as a string, if existent, the number
         proceeding the string 'Chapter ' in the string."""
@@ -52,7 +54,85 @@ class Line:
     	   
         return self[x:y]
 
+    def get_figure_num(self):
+        """Uses the unicode text to output the figure number (as unicode)."""
+        pass
+    
+    def get_caption(self):
+        """Returns caption (after figure number)."""
+        pass
+    
+    def get_copyright(self):
+        """Returns associated copyright privilege level."""
+        pass
+    
+    def get_object_type(self):
+        """Given the string, returns a guess of what type of object is being described in the caption (as unicode)."""
+        #for each noun chunk
+        #look to see if it can be found in the extended keywords list
+        #if so
+            #look in the word associations dictionary to see what object type the word maps to
+        #otherwise
+            #return nothing
+        pass
+        
+    def get_material_type(self):
+        """Returns a guess of what sort of material was used to create the object described in the caption (as unicode)."""
+        #if an object type was found
+            #look in object<-->material dictionary to see what it was probably made from
+        #otherwise
+            #return ""
+        pass
+    
+    def get_doc_type(self):
+        """Returns a guess of how the figure was captured (as unicode)."""
+        #look through interesting word chunks
+        #for each word chunk
+            #if there is a word that matches with the keyword<-->documentation dictionary
+            #return the documentation guess
+        #else
+            #return "picture" #usually when not stated, is a photograph
+        pass
+    
+    def get_creator(self):
+        """Guesses the creator of the figure from caption text. Returns as unicode."""
+        #look through the names
+        #if an obvious lead-up like "by" or "courtesy of" comes before the name
+            #return the name
+        #else return ""
+        pass
 
+    def get_creator_role(self):
+        """Returns creator's role."""
+        #if there's a doc type and creator
+            #look up corresponding tuple in tupe-->role dictionary
+        #else reutnr ""
+        pass
+    
+    def get_cultural_term(self):
+        """Returns guess of cultural term by comparing chunks to a given dict."""
+        pass #no such dict quite yet
+
+    def get_date_type(self):
+        pass
+    
+    def get_temporal_term(self):
+        pass
+    
+    def get_geographic_term(self):
+        pass
+    
+    def get_status(self):
+        """Returns status of caption, which, when first uploading, is always 'Needs Review.'"""
+        return 'Needs Review.'
+        
+    def get_permissions(self):
+        pass
+    
+    def get_image(self):
+        """Returns image."""
+        pass #don't have those files on this computer, and wouldn't be able to do much with them anyway...
+        
 
 #def tree_to_list(t, l):
 #    """Takes in an object that may be a tree, and an empty list l.
