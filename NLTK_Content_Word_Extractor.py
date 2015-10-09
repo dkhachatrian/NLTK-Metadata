@@ -50,6 +50,10 @@ with codecs.open("Cleaned Captions.txt", 'r', encoding = 'utf-8') as f:
                                 #for tup in all_tuples:
                                 #    w.write(str(tup) + '\t')
                                 #    
+                                for x in range(2):                                      
+                                    w.write('\n')
+                                w.write(g.IGNORE_SEQ + "And the caption the above list came from is the following: '\n'")
+                                w.write(g.IGNORE_SEQ + u)
                                 for x in range(3):
-                                    w.write('\n') #twice to make it easier on the eyes to separate captions
+                                    w.write('\n') #thrice to make it easier on the eyes to separate captions
 
