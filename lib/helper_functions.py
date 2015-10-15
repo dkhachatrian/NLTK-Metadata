@@ -3,6 +3,9 @@
 from nltk.corpus import wordnet as wn
 import nltk
 import shared as g
+import kitchen.text.converters as k
+import re
+
 #IGNORE_CHAR = '#'
 
 class Line:
@@ -56,15 +59,50 @@ class Line:
 
     def get_figure_num(self):
         """Uses the unicode text to output the figure number (as unicode)."""
-        pass
+
+        #copypasta from txt2re.com with a bit of modification...
+        #as we get weirder and weirder formats, we'd have to expand our regexp to look for these other formats
+        
+        re1='.*?'	# Non-greedy match on filler
+        re2='\\d+'	# Uninteresting: int
+        re3='.*?'	# Non-greedy match on filler
+        re4='\\d+'	# Uninteresting: int
+        re5='.*?'	# Non-greedy match on filler
+        re6='(\\d+)'	# Integer Number 1
+        
+        rg = re.compile(re1+re2+re3+re4+re5+re6,re.IGNORECASE|re.DOTALL)
+        m = rg.search(self.raw_text)
+        if m:
+            int1=m.group(1)
+            return str(int1)
+        else:
+            return g.not_found
     
     def get_caption(self):
         """Returns caption (after figure number)."""
-        pass
+        
+        #copypasta from txt2re.com with a bit of modification...
+        #as we get weirder and weirder formats, we'd have to expand our regexp to look for these other formats
+        
+        re1='((?:(?:[0-2]?\\d{1})|(?:[3][01]{1}))[-:\\/.](?:[0]?[1-9]|[1][012])[-:\\/.](?:(?:\\d{1}\\d{1})))(?![\\d])'	# DDMMYY 1
+        re2='.*?'	# Non-greedy match on filler
+        re3='(\\s+)'	# White Space 1
+        
+        rg = re.compile(re1+re2+re3,re.IGNORECASE|re.DOTALL)
+        m = rg.search(self.raw_text)
+        if m:   #we'll bypass the figure number...
+            ddmmyy1=m.group(1)
+            c1=m.group(2)
+            ws1=m.group(3)
+            l = len(ddmmyy1) + len(c1) + len(ws1) #get the length of the figure number and whitespace
+            return self.raw_text[l:] #return the substring of everything after the figure number
+        else:
+            return g.not_found
     
     def get_copyright(self):
         """Returns associated copyright privilege level."""
-        pass
+        #unless I get some file explaining the permissions, let's pass...
+        return g.not_found
     
     def get_object_type(self):
         """Given the string, returns a guess of what type of object is being described in the caption (as unicode)."""
@@ -106,7 +144,7 @@ class Line:
         """Returns creator's role."""
         #if there's a doc type and creator
             #look up corresponding tuple in tupe-->role dictionary
-        #else reutnr ""
+        #else return ""
         pass
     
     def get_cultural_term(self):
