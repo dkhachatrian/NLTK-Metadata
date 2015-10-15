@@ -1,6 +1,8 @@
+import kitchen.text.converters as k
+
 IGNORE_SEQ = '#' #if at beginning of the line, means not to process it...
 excluded = ['(',')'] #exclude from tags looking for 'NN.'s
-
+not_found = ""
 
 #
 ###### COPYPASTA #####
