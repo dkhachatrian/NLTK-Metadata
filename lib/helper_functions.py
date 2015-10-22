@@ -14,6 +14,7 @@ class Line:
         self.tokens = nltk.word_tokenize(s) #break line into word "tokens"
         self.tagged = nltk.pos_tag(self.tokens) #assign tags to token's role in sentence
         self.entities = nltk.ne_chunk(self.tagged)
+        self.people = self.get_people(self)
         
     def get_nouns(self):
         """Returns the nouns in Line as a list."""
@@ -134,16 +135,22 @@ class Line:
     
     def get_creator(self):
         """Guesses the creator of the figure from caption text. Returns as unicode."""
-        #look through the names
-        #if an obvious lead-up like "by" or "courtesy of" comes before the name
-            #return the name
-        #else return ""
-        pass
+        
+        s = self.raw_text
+        
+        for name in self.names: #look through the names
+            for phrase in g.creator_leading_phrases:
+                if phrase in s:
+                    if s.index(phrase) + len(phrase) + len (' ') == s.index(name): #if an obvious lead-up like "by" or "courtesy of" comes before the name
+                        return name #return the name
+        #else return ""                
+        return g.not_found
+
 
     def get_creator_role(self):
         """Returns creator's role."""
         #if there's a doc type and creator
-            #look up corresponding tuple in tupe-->role dictionary
+            #look up corresponding tuple in doc-->role dictionary
         #else return ""
         pass
     
