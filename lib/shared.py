@@ -1,10 +1,11 @@
 import kitchen.text.converters as k
+from nltk.corpus import wordnet as wn
 
 IGNORE_SEQ = '#' #if at beginning of the line, means not to process it...
 excluded = ['(',')'] #exclude from tags looking for 'NN.'s
 not_found = ""
 creator_leading_phrases = ['by', 'courtesy of']
-
+wnl = nltk.WordNetLemmatizer()
 #
 ###### COPYPASTA #####
 #
