@@ -1,0 +1,10 @@
+Object Type List (current list)
+
+List can include:
+{"stela", "symbol", "sculpture", "map", "motif", "temple", "vessel", "tool", "textile", "pendant", "chart"}
+
+"tool" = "pestle", "grinder", "grinding", "implement"
+"vessel" = "kero", "jar", "tazones", "taz—n"
+"textile" = "panel", "band", "fabric"
+"vessel" = "sherd"
+"chart" = "chronology"
