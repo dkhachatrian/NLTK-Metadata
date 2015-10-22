@@ -1,0 +1,9 @@
+Documentation Type List (current list)
+
+List can include:
+{"drawing", "photograph", "chart"}
+
+"drawing" = "drawn", “illustration”, “illustrated”
+"chart" = "graph", "chart", "map"
+
+Special note: the documentation type of photograph is assumed unless one of the other documentation types is evident from the caption text.
