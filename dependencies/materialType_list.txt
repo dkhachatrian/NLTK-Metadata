@@ -1,0 +1,9 @@
+Material Type List (current list)
+
+List can include:
+{"ground stone", "fire cracked rock", "wood", "stone", "shell", "wool", "mineral", "microbotanical", "cotton", "dating sample", "chipped stone", "ceramic", "basketry", "fauna", "glass", "metal", "macrobotanical", "human remains", "hide", "architecture"}
+
+"ceramic" = "bowl”, “jar”, “plate”, "vessel", "sherd"
+"metal" = "gold", "silver"
+"stone" = "stela"
+"architecture" = "building", "ruins", "arch"
