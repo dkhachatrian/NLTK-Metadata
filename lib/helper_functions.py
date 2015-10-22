@@ -15,6 +15,7 @@ class Line:
         self.tagged = nltk.pos_tag(self.tokens) #assign tags to token's role in sentence
         self.entities = nltk.ne_chunk(self.tagged)
         self.people = self.get_people(self)
+        self.lemmas = self.get_lemmas(self)
         
     def get_nouns(self):
         """Returns the nouns in Line as a list."""
@@ -40,7 +41,19 @@ class Line:
         toi = ['NN', 'VB', 'JJ'] #tags of interest: noun, verb, adjective
         return [w for w in self.tagged if (len(w[1])>1 and w[1][:2] in toi and w[0] not in excluded)]
 
+    def get_lemmas(self):
+        """Returns a list of lemmas (root-words) for the tokens in the line."""
+        
 
+        nouns = self.get_nouns()
+        lwc = [noun.lower() for noun in nouns]
+        s = set(lwc)
+        
+        lemmas = [g.wnl.lemmatize(t) for t in s] 
+        
+        return lemmas
+    
+    
 
     def get_chapter_num(self):
         """Takes in a string. Returns as a string, if existent, the number
@@ -107,13 +120,23 @@ class Line:
     
     def get_object_type(self):
         """Given the string, returns a guess of what type of object is being described in the caption (as unicode)."""
-        #for each noun chunk
-        #look to see if it can be found in the extended keywords list
+        
+        targets = ""                        
+                    
+        for lemma in self.lemmas: #for each noun chunk
+            for key in objectTypeDict:
+                if lemma in objectTypeDict[key]: #objectTypeDict[key] is a list containing words that map to the term "key"
+                    targets += key + ', '
+        
+        if len(targets) > 2: #targets is a string, not the number of actual matches
+            targets = targets[:-2]         
+        return targets #remove last set of ', '
+        
+            #look to see if it can be found in the corresponding dict
         #if so
             #look in the word associations dictionary to see what object type the word maps to
         #otherwise
             #return nothing
-        pass
         
     def get_material_type(self):
         """Returns a guess of what sort of material was used to create the object described in the caption (as unicode)."""
@@ -312,3 +335,140 @@ def build_expanded_keywords(l):
                     d[word].append(entry)
 
     return d
+
+
+
+
+
+
+
+###########################################################
+################## COPYPASTA FROM SAIS SCRIPT #############
+###########################################################
+
+####    HELPER FUNCTIONS    ####
+
+def getWordInQuotes(s):
+    "Takes in a string. Returns a string with the contents of the first word or phrase enveloped in double-quotes."
+    "Returns an empty string if no quotes in string."
+    "(For use with files containing lists of interest.)"
+    "For example, \"I like pie!\" will return the string literal 'I like pie!' (with no '' surrounding it)."
+
+    contents = ""
+    i = j = 0
+
+    if '\"' in s:
+        i = s.find('\"')
+        i += 1 #goes to right after the first quote
+
+    if '\"' in s[i:]: #if another quote in rest of string, get it
+        j = s.rfind('\"')
+        if j == -1: #prevent backslicing if not located
+            j = 0
+
+    if i >= 0 and j > 0:
+        contents = s[i:j]
+
+#    print(i)
+#    print(j)
+#    print(contents)
+
+    return contents
+
+#test = "="
+#print(getWordInQuotes(test))
+
+##### TEST CASES ###
+##
+##extraQuotes = "\"I like pie!\""
+##withoutQuotes = getWordInQuotes(extraQuotes)
+##noQuotes = "I like pie!"
+##
+##print(withoutQuotes)
+##print(extraQuotes)
+##print(noQuotes)
+
+
+
+
+
+
+##############
+######### From Files Containing Controlled Vocabulary #########
+##############
+
+#text files are structured so that the master list of all possible entries starts with a "{". All entries are enclosed in quotes ("").
+#Associations are denoted in the following way: the entry from the master list is written first, followed by an equals sign "=",
+#followed by words that map to this first word, also in quotes.
+#Each newline corresponds to a new masterword being mapped.
+#If there is a line that may cause confusion or otherwise should not be parsed,
+#place at least two backslashes ('\') at the front of the line.
+
+
+objectTypeDict = {}
+materialTypeDict = {}
+docTypeDict = {}
+
+
+def formDictionaryfromFile(d, f):
+    "Takes in a file with lines indicating dictionary values and associated keys. Forms the corresponding dictioary from this file."
+    "The values of the dictionary are lists."
+    "(Specifics as to file format is given in comments above.)"
+
+    lines = f.readlines()
+#    word = ""
+
+    for line in lines:
+        if len(line) >= 2 and line[0:2] == "\\":
+                continue #allow to pass lines if necessary
+#        word = ""
+        
+        unclean_words = line.split()
+        words = [g.wnl.lemmatize(word) for word in unclean_words] #use root-words (lemmas) to have to worry less about odd conjugations
+        
+#        print(words)
+        
+        x = 0
+        n = len(words)
+            
+        while x < n:
+#            print(x)
+            s = getWordInQuotes(words[x])
+            if s == "":     #if returns empty string, no "" in word, not one of the desired words
+                words.remove(words[x])
+                n = len(words) #to update the length of list, equivalent to " n -= 1 "
+            else:
+                words[x] = s #otherwise update with non-quoted word
+                x += 1
+
+        #print(words)
+
+        
+        if '{' in line and len(d) == 0: #'{' is what's used to recognize it's the line with all the keys
+            for entry in words:
+                d.setdefault(entry,[]).append(entry) #if the caption has the specific word itself, it maps to itself (i.e., a stela is a stela...)
+                #setdefault checks to see if entry is in d (it shouldn't be); if not, it makes d[entry] = []. The append function then adds entry to the newly formed list
+
+        #above if statement should occur before anything else. Use this to check which word to
+
+        
+
+        elif '=' in line and len(words) > 0 and words[0] in d.keys():   #'=' is used to recognize it has the words associated to the keys
+            for x in range(1,len(words)):
+                d.setdefault(words[0],[]).append(words[x])
+        
+
+
+#with open("objectType_list.txt", 'r', encoding = 'iso-8859-1') as otl: #object type list
+#        formDictionaryfromFile(objectTypeDict, otl)
+#with open("materialType_list.txt", 'r', encoding = 'iso-8859-1') as mtl: #material type list
+#        formDictionaryfromFile(materialTypeDict, mtl)
+#with open("docType_list.txt", 'r', encoding = 'iso-8859-1') as dtl: #document type list
+#        formDictionaryfromFile(docTypeDict, dtl)
+
+
+#print(objectTypeDict)
+#print(materialTypeDict)
+#print(docTypeDict)
+
+#should have dictionaries I want. Don't need lists anymore.
