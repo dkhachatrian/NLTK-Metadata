@@ -5,11 +5,19 @@ Documentation --> Creator Role List (current list)
 // The keys will be the different documentation types.
 // The values will be their corresponding role.
 
-"drawing" --> "image creator"
-"photograph" --> "image creator"
+//IGNORE LAST TWO LINES. (Apparently my original method of making the dictionaries is backwards...
+//	...I look through lists of values to choose the appropriate key...
+//	...Smaller dictionary sizes, but opposite flow than how it should be used...
 
-"map" --> "map maker"
-"chart" --> "map maker"
+"image creator" = "drawing", "photograph"
+"map maker" = "map", "chart"
+
+
+////"drawing" --> "image creator"
+////"photograph" --> "image creator"
+
+////"map" --> "map maker"
+////"chart" --> "map maker"
 
 //"plot" is a "map" or a "chart"?
 
