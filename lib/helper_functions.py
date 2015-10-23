@@ -16,6 +16,8 @@ class Line:
         self.entities = nltk.ne_chunk(self.tagged)
         self.people = self.get_people(self)
         self.lemmas = self.get_lemmas(self)
+        self.creator = self.get_creator(self)
+        self.docType = self.get_doc_type(self)
         
     def get_nouns(self):
         """Returns the nouns in Line as a list."""
@@ -125,12 +127,12 @@ class Line:
                     
         for lemma in self.lemmas: #for each noun chunk
             for key in objectTypeDict:
-                if lemma in objectTypeDict[key]: #objectTypeDict[key] is a list containing words that map to the term "key"
+                if lemma in objectTypeDict[key]: #xxxTypeDict[key] is a list containing words that map to the term "key"
                     targets += key + ', '
         
         if len(targets) > 2: #targets is a string, not the number of actual matches
-            targets = targets[:-2]         
-        return targets #remove last set of ', '
+            targets = targets[:-2]    #remove last set of ', '      
+        return targets 
         
             #look to see if it can be found in the corresponding dict
         #if so
@@ -140,21 +142,34 @@ class Line:
         
     def get_material_type(self):
         """Returns a guess of what sort of material was used to create the object described in the caption (as unicode)."""
-        #if an object type was found
-            #look in object<-->material dictionary to see what it was probably made from
-        #otherwise
-            #return ""
-        pass
+        #### SEE GET_OBJECT_TYPE         
+        
+        targets = ""                        
+                    
+        for lemma in self.lemmas: #for each noun chunk
+            for key in objectTypeDict:
+                if lemma in materialTypeDict[key]: #xxxTypeDict[key] is a list containing words that map to the term "key"
+                    targets += key + ', '
+        
+        if len(targets) > 2: #targets is a string, not the number of actual matches
+            targets = targets[:-2]    #remove last set of ', '      
+        return targets 
     
     def get_doc_type(self):
         """Returns a guess of how the figure was captured (as unicode)."""
-        #look through interesting word chunks
-        #for each word chunk
-            #if there is a word that matches with the keyword<-->documentation dictionary
-            #return the documentation guess
-        #else
-            #return "picture" #usually when not stated, is a photograph
-        pass
+        #### SEE GET_OBJECT_TYPE         
+        
+        targets = ""                        
+                    
+        for lemma in self.lemmas: #for each noun chunk
+            for key in objectTypeDict:
+                if lemma in docTypeDict[key]: #xxxTypeDict[key] is a list containing words that map to the term "key"
+                    targets += key + ', '
+        
+        if len(targets) > 2: #targets is a string, not the number of actual matches
+            targets = targets[:-2]    #remove last set of ', '      
+        return targets 
+    
     
     def get_creator(self):
         """Guesses the creator of the figure from caption text. Returns as unicode."""
@@ -172,10 +187,11 @@ class Line:
 
     def get_creator_role(self):
         """Returns creator's role."""
-        #if there's a doc type and creator
-            #look up corresponding tuple in doc-->role dictionary
-        #else return ""
-        pass
+        creatorRole = g.not_found
+        
+        if self.creator != g.not_found and self.docType != g.not_found: #if there's a doc type and creator
+            creatorRole =  dTypetoRole[self.docType]#look up corresponding tuple in doc-->role dictionary
+        return creatorRole
     
     def get_cultural_term(self):
         """Returns guess of cultural term by comparing chunks to a given dict."""
@@ -408,7 +424,7 @@ def getWordInQuotes(s):
 objectTypeDict = {}
 materialTypeDict = {}
 docTypeDict = {}
-
+dTypeToRole_map = {}
 
 def formDictionaryfromFile(d, f):
     "Takes in a file with lines indicating dictionary values and associated keys. Forms the corresponding dictioary from this file."
@@ -424,7 +440,8 @@ def formDictionaryfromFile(d, f):
 #        word = ""
         
         unclean_words = line.split()
-        words = [g.wnl.lemmatize(word) for word in unclean_words] #use root-words (lemmas) to have to worry less about odd conjugations
+        words = unclean_words #want to test line below before including...
+#        words = [g.wnl.lemmatize(word) for word in unclean_words] #use root-words (lemmas) to have to worry less about odd conjugations
         
 #        print(words)
         
@@ -465,6 +482,8 @@ def formDictionaryfromFile(d, f):
 #        formDictionaryfromFile(materialTypeDict, mtl)
 #with open("docType_list.txt", 'r', encoding = 'iso-8859-1') as dtl: #document type list
 #        formDictionaryfromFile(docTypeDict, dtl)
+with open("docTypetoCreatorRole_map.txt", 'r', encoding = 'utf-i') as dtcrm:
+    formDictionaryfromFile(dTypeToRole_map, dtcrm)
 
 
 #print(objectTypeDict)
