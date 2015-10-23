@@ -1,0 +1,16 @@
+Documentation --> Creator Role List (current list)
+
+// Map for the [list of words that describe role = key] --> [creator role = value] dictionary
+// Creator role obtained only if a creator for the caption was found.
+// The keys will be the different documentation types.
+// The values will be their corresponding role.
+
+"drawing" --> "image creator"
+"photograph" --> "image creator"
+
+"map" --> "map maker"
+"chart" --> "map maker"
+
+//"plot" is a "map" or a "chart"?
+
+// Special note: the documentation type of photograph is assumed unless one of the other documentation types is // evident from the caption text.
