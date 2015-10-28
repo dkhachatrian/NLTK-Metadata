@@ -7,10 +7,6 @@ not_found = ""
 creator_leading_phrases = ['by', 'courtesy of']
 wnl = nltk.WordNetLemmatizer()
 
-objectTypeDict = {}
-materialTypeDict = {}
-docTypeDict = {}
-dTypeToRole_map = {}
 #
 ###### COPYPASTA #####
 #
