@@ -6,6 +6,11 @@ excluded = ['(',')'] #exclude from tags looking for 'NN.'s
 not_found = ""
 creator_leading_phrases = ['by', 'courtesy of']
 wnl = nltk.WordNetLemmatizer()
+
+objectTypeDict = {}
+materialTypeDict = {}
+docTypeDict = {}
+dTypeToRole_map = {}
 #
 ###### COPYPASTA #####
 #
