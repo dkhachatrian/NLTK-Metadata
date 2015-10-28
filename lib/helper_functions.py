@@ -147,7 +147,7 @@ class Line:
         targets = ""                        
                     
         for lemma in self.lemmas: #for each noun chunk
-            for key in objectTypeDict:
+            for key in materialTypeDict:
                 if lemma in materialTypeDict[key]: #xxxTypeDict[key] is a list containing words that map to the term "key"
                     targets += key + ', '
         
@@ -162,7 +162,7 @@ class Line:
         targets = ""                        
                     
         for lemma in self.lemmas: #for each noun chunk
-            for key in objectTypeDict:
+            for key in docTypeDict:
                 if lemma in docTypeDict[key]: #xxxTypeDict[key] is a list containing words that map to the term "key"
                     targets += key + ', '
         
@@ -190,7 +190,7 @@ class Line:
         creatorRole = g.not_found
         
         if self.creator != g.not_found and self.docType != g.not_found: #if there's a doc type and creator
-            creatorRole =  dTypetoRole[self.docType]#look up corresponding tuple in doc-->role dictionary
+            creatorRole =  dTypeToRole_map[self.docType]#look up corresponding tuple in doc-->role dictionary
         return creatorRole
     
     def get_cultural_term(self):
@@ -246,7 +246,7 @@ def consolidate_tokens(l,s):
         #l[x] is a singular person's name in tuples along with position tag. l[x][y][0] gives the y'th part of the name.
         i = 0
         temp.append(l[x+i]) #first word...
-        while x + i + 1 < len(l): #while the next "Persons" after them also only have one part of a name
+        while x + i + 1 < len(l): #while the next "Persons" after them also obinly have one part of a name
             dist = abs(s.find(l[x+i]) + len(l[x+i]) - s.find(l[x+i+1]))
             if dist == 1: #if the distance between the two "Persons" is less than one char away (i.e. there's a ' ' between the two)
                 temp.append(l[x+i+1]) #add the consecutive words...
@@ -420,6 +420,7 @@ def getWordInQuotes(s):
 #If there is a line that may cause confusion or otherwise should not be parsed,
 #place at least two backslashes ('\') at the front of the line.
 
+### DICTS in shared.py
 
 objectTypeDict = {}
 materialTypeDict = {}
@@ -482,7 +483,7 @@ def formDictionaryfromFile(d, f):
 #        formDictionaryfromFile(materialTypeDict, mtl)
 #with open("docType_list.txt", 'r', encoding = 'iso-8859-1') as dtl: #document type list
 #        formDictionaryfromFile(docTypeDict, dtl)
-with open("docTypetoCreatorRole_map.txt", 'r', encoding = 'utf-i') as dtcrm:
+with open("docTypetoCreatorRole_map.txt", 'r', encoding = 'utf-8') as dtcrm:
     formDictionaryfromFile(dTypeToRole_map, dtcrm)
 
 
