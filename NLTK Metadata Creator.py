@@ -17,6 +17,7 @@ s#ys.path.insert(0, '.\\lib')
 #sys.path.insert(0, './dependencies/')
 #import helper_functions
 
+
 #import sys
 #if sys.hexversion < 0x030000a1: #hex value corresponds to 3.0.0rev1
 #    from __future__ import print_function
@@ -24,56 +25,23 @@ s#ys.path.insert(0, '.\\lib')
 #import helper_functions.*
 #from helper_functions import * #figure out how to get this to work?
 from lib import helper_functions as hf
+from lib import shared as g
 
 import nltk
 from nltk.corpus import wordnet as wn
 
 #keywords = [] #will be built from words given by authors
-with open('Keywords.txt', 'r') as kw:
+with open('./dependencies/Keywords.txt', 'r') as kw:
     keywords = hf.build_keywords_from_file(kw) 
 expanded_keywords = hf.build_expanded_keywords(keywords)
                 
-text_file = os.path.join(dname, 'test.txt')
+captions = os.path.join(dname, 'Figure Captions.txt') #the captions
 #first_names = nltk.corpus.names.words() # first names corpus, as a list, if necessary
 
 
 #now that I have the expanded keywords, a list of list of strings,
 #we can see whether these words are found in a line. 
 
-
-#Now let's create our file and our header (some boilerplate from before...)
-
-
-
-##### COPYPASTA #####
-
-
-###############################################
-######### A bunch of declarations...###########
-###############################################
-
-#Worth noting: when writing to file, will need to convert strings to bytes using bytes(string, encoding scheme)
-
-DELIMITER = '\t'  #will be tab-separated
-IN_CELL_DELIMITER = ',' #when phrases need to be differentiated within a cell in the CSV
-PERSONS_MAX = 10 #total number of people of a specific type, e.g. Creator or Author, in a row. Determined by Metadata Fields.txt.
-                #To simplify code, all the different types of people have the same max.
-
-excelHeader = ""
-metadataFields = [] #list
-
-with open("Metadata Fields.txt", 'r') as mf:
-        #may want to change the wording of the below lines, would mess up if there were more than one line
-        for line in mf: #should only be the one line with column headers
-                metadataFields = line.split('\t') #splits into list using comma as delimiter (for .csv)
-        for entry in metadataFields:
-                excelHeader = excelHeader + entry + DELIMITER
-#        for line in mf:
-#                metadataFields.append(line[:-1])    #line[:-1] removes '\n' from line
-#                excelHeader = excelHeader + line[:-1] + DELIMITER
-        #excelHeader has extra \t at end
-        excelHeader = excelHeader[0:-1] #cut off last \t
-        #excelHeader does NOT have a \n at the end
 
 
 ####
@@ -86,20 +54,21 @@ with open("Metadata Fields.txt", 'r') as mf:
 #########   and then spit it out for the field...
 
 
-with open(text_file, 'r') as f:
+with open(captions, 'r') as f:
     for fline in f:
         line = hf.Line(fline)
         
-        hf.
+        line.write_to_file(f)
+
         
-        cNum = line.get_chapter_num()
-        nouns = line.get_nouns()
-        people = line.get_people()
-	
-        for noun in nouns:
-            loc_info = hf.in_container(noun, expanded_keywords) # gives a tuple, (the element in which
-            if noun in keywords or loc_info != (None, -1):
-                pass
+#        cNum = line.get_chapter_num()
+#        nouns = line.get_nouns()
+#        people = line.get_people()
+#	
+#        for noun in nouns:
+#            loc_info = hf.in_container(noun, expanded_keywords) # gives a tuple, (the element in which
+#            if noun in keywords or loc_info != (None, -1):
+#                pass
                 
 
 
@@ -109,23 +78,5 @@ with open(text_file, 'r') as f:
 
 
 ### When writing to file, will need to encode the unicode (== "str" in Python 3)  with s.encode('utf8')
-
-
-
-            
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
