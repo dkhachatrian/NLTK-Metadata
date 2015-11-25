@@ -9,10 +9,10 @@ os.chdir(dname)
 
 
 #### To have Python look for the modules where I want them to)
-import sys
+#import sys
 #sys.path.insert(0, os.path.join(dname, 'dependencies'))
-sys.path.insert(0, os.path.join(dname, 'lib'))
-s#ys.path.insert(0, '.\\lib')
+#sys.path.insert(0, os.path.join(dname, 'lib'))
+#sys.path.insert(0, '.\\lib')
 #sys.path.insert(0, 'E:/Work/dependencies/')
 #sys.path.insert(0, './dependencies/')
 #import helper_functions
@@ -27,15 +27,16 @@ s#ys.path.insert(0, '.\\lib')
 from lib import helper_functions as hf
 from lib import shared as g
 
-import nltk
-from nltk.corpus import wordnet as wn
+#import nltk
+#from nltk.corpus import wordnet as wn
 
 #keywords = [] #will be built from words given by authors
-with open('./dependencies/Keywords.txt', 'r') as kw:
-    keywords = hf.build_keywords_from_file(kw) 
-expanded_keywords = hf.build_expanded_keywords(keywords)
+#with open(os.path.join(dname, 'dependencies', 'Keywords.txt'), 'r') as kw:
+#    keywords = hf.build_keywords_from_file(kw) 
+#expanded_keywords = hf.build_expanded_keywords(keywords)
                 
-captions = os.path.join(dname, 'Figure Captions.txt') #the captions
+captions = os.path.join(g.dep_dir, 'Cleaned Captions.txt') #the captions
+output = os.path.join(g.out_dir, 'Caption Metadata.txt')
 #first_names = nltk.corpus.names.words() # first names corpus, as a list, if necessary
 
 
@@ -53,12 +54,33 @@ captions = os.path.join(dname, 'Figure Captions.txt') #the captions
 #########   If I can, look up that word in our list of associations (TODO: set up list of associations)
 #########   and then spit it out for the field...
 
+i = 0
+j = 1
 
-with open(captions, 'r') as f:
-    for fline in f:
-        line = hf.Line(fline)
+with open(captions, 'r') as r:
+    with open(output, 'w') as o:
+        r_lines = r.readlines()
         
-        line.write_to_file(f)
+        o.write(g.excelHeader + g.ROW_DELIMITER)
+                
+        
+        for r_line in r_lines:
+            
+            ### to ensure things are still moving...
+            if i < g.REFRESH_NUMBER:
+                i+=1
+            elif i == g.REFRESH_NUMBER:
+                print("Yup, still going... Number of times you've seen this message: " + str(j))
+                j += 1
+                i = 0
+            
+
+            line = hf.Line(r_line)
+            
+            s = line.get_info_for_file()
+            o.write(s + g.ROW_DELIMITER)
+        
+        
 
         
 #        cNum = line.get_chapter_num()
