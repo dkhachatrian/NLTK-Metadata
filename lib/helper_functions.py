@@ -6,7 +6,10 @@ from lib import shared as g
 #import kitchen.text.converters as k
 import re
 
-
+import os
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+rname = os.path.dirname(dname) #root directory of
 ######## DOWNLOADING NECESSARY COMPONENTS FROM NLTK ##############
 
 # ...For now, will install everything from NLTK,
@@ -97,60 +100,138 @@ class Line:
     def get_chapter_num(self):
         """Takes in a string. Returns as a string, if existent, the number
         proceeding the string 'Chapter ' in the string."""
-        s = self.raw_text
-        x = -1
-        y = -1
-        keyString = 'Chapter '
-        if keyString in s:
-            x = s.index(keyString) + len(keyString)
-            y = x
-    
-            while self[y].isdigit():
-                y += 1
-    	   
-        return self[x:y]
+        
+        rg = r'(\d+\.\d+\.\d+(\.)*)'
+        m = re.search(rg, self.raw_text)        #should only match the digits.digits.digits(.'s) pattern
+        
+        if m:
+            rg_beg = r'^(\d+)'
+            mm = re.search(rg_beg, m.group(0)) #m.group(0) is the first and only match of the first part
+            
+            return mm.group(0)
+        else:
+            return g.not_found
+        
+#        re1=r'(\\d+)'	# Integer Number 1
+#        re2=r'(\\.)'	# Any Single Character 1
+#        re3=r'(\\d+)'	# Integer Number 2
+#        re4=r'(\\d)'	# Any Single Digit 1
+#        re5=r'(\\.)'	# Any Single Character 2
+#        re6=r'(\\d+)'	# Integer Number 3
+#
+#        rg = re.compile(re1+re2+re3+re4+re5+re6,re.IGNORECASE|re.DOTALL)
+#        m = rg.search(self.raw_text)
+#        if m:
+#            int1=m.group(1)
+#            #c1=m.group(2)
+#            #int2=m.group(3)
+#            #d1=m.group(4)
+#            #c2=m.group(5)
+#            #int3=m.group(6)
+#            
+#            return str(int1) #should give just the part of the caption I want...
+#        else:
+#            return g.not_found        
+        
+        
+#        s = self.raw_text
+#        x = -1
+#        y = -1
+#        keyString = 'Chapter '
+#        if keyString in s:
+#            x = s.index(keyString) + len(keyString)
+#            y = x
+#    
+#            while self[y].isdigit():
+#                y += 1
+#    	   
+#        return self[x:y]
 
     def get_figure_num(self):
         """Uses the unicode text to output the figure number (as unicode)."""
 
-        #copypasta from txt2re.com with a bit of modification...
-        #as we get weirder and weirder formats, we'd have to expand our regexp to look for these other formats
+        #n = l[0] #in current configuration, first word contains all the information
+
+        rg = r'(\d+\.\d+\.\d+?)'
+        m = re.search(rg, self.raw_text)        #should only match the digits.digits.digits(.'s) pattern
         
-        re1='.*?'	# Non-greedy match on filler
-        re2='\\d+'	# Uninteresting: int
-        re3='.*?'	# Non-greedy match on filler
-        re4='\\d+'	# Uninteresting: int
-        re5='.*?'	# Non-greedy match on filler
-        re6='(\\d+)'	# Integer Number 1
-        
-        rg = re.compile(re1+re2+re3+re4+re5+re6,re.IGNORECASE|re.DOTALL)
-        m = rg.search(self.raw_text)
         if m:
-            int1=m.group(1)
-            return str(int1)
+            rg_end = r'(\d+\.\d+)$'
+            mm = re.search(rg_end, m.group(0)) #m.group(0) is the first and only match of the first part
+            
+            return mm.group(0)
         else:
             return g.not_found
+
+
+#        re1=r'(\\d+)'	# Integer Number 1
+#        re2=r'(\\.)'	# Any Single Character 1
+#        re3=r'(\\d+)'	# Integer Number 2
+#        re4=r'(\\d)'	# Any Single Digit 1
+#        re5=r'(\\.)'	# Any Single Character 2
+#        re6=r'(\\d+)'	# Integer Number 3
+#
+#        rg = re.compile(re1+re2+re3+re4+re5+re6,re.IGNORECASE|re.DOTALL)
+#        m = rg.search(self.raw_text)
+#        if m:
+#            #int1=m.group(1)
+#            #c1=m.group(2)
+#            int2=m.group(3)
+#            d1=m.group(4)
+#            c2=m.group(5)
+#            int3=m.group(6)
+#            
+#            return str(int2+d1+c2+int3) #should give just the part of the caption I want...
+#        else:
+#            return g.not_found
+
+#        #copypasta from txt2re.com with a bit of modification...
+#        #as we get weirder and weirder formats, we'd have to expand our regexp to look for these other formats
+#        
+#        re1='.*?'	# Non-greedy match on filler
+#        re2='\\d+'	# Uninteresting: int
+#        re3='.*?'	# Non-greedy match on filler
+#        re4='\\d+'	# Uninteresting: int
+#        re5='.*?'	# Non-greedy match on filler
+#        re6='(\\d+)'	# Integer Number 1
+#        
+#        rg = re.compile(re1+re2+re3+re4+re5+re6,re.IGNORECASE|re.DOTALL)
+#        m = rg.search(self.raw_text)
+#        if m:
+#            int1=m.group(1)
+#            return str(int1)
+#        else:
+#            return g.not_found
     
     def get_caption(self):
         """Returns caption (after figure number)."""
         
-        #copypasta from txt2re.com with a bit of modification...
-        #as we get weirder and weirder formats, we'd have to expand our regexp to look for these other formats
-        
-        re1='((?:(?:[0-2]?\\d{1})|(?:[3][01]{1}))[-:\\/.](?:[0]?[1-9]|[1][012])[-:\\/.](?:(?:\\d{1}\\d{1})))(?![\\d])'	# DDMMYY 1
-        re2='.*?'	# Non-greedy match on filler
-        re3='(\\s+)'	# White Space 1
-        
-        rg = re.compile(re1+re2+re3,re.IGNORECASE|re.DOTALL)
-        m = rg.search(self.raw_text)
-        if m:   #we'll bypass the figure number...
-            ddmmyy1=m.group(1)
-            c1=m.group(2)
-            ws1=m.group(3)
-            l = len(ddmmyy1) + len(c1) + len(ws1) #get the length of the figure number and whitespace
-            return self.raw_text[l:] #return the substring of everything after the figure number
+        rg = r'(\d+\.\d+\.\d+(\.)*(\s)*)' #\d = digits. \s = whitespace
+        m = re.split(rg, self.raw_text)        #should only match the digits.digits.digits(.'s) pattern
+                        
+        if m and len(m[-1]) > 0:
+            result = m[-1].replace('\n', '')
+            return result #last part of split lsit; should be caption
         else:
             return g.not_found
+        
+#        #copypasta from txt2re.com with a bit of modification...
+#        #as we get weirder and weirder formats, we'd have to expand our regexp to look for these other formats
+#        
+#        re1='((?:(?:[0-2]?\\d{1})|(?:[3][01]{1}))[-:\\/.](?:[0]?[1-9]|[1][012])[-:\\/.](?:(?:\\d{1}\\d{1})))(?![\\d])'	# DDMMYY 1
+#        re2='.*?'	# Non-greedy match on filler
+#        re3='(\\s+)'	# White Space 1
+#        
+#        rg = re.compile(re1+re2+re3,re.IGNORECASE|re.DOTALL)
+#        m = rg.search(self.raw_text)
+#        if m:   #we'll bypass the figure number...
+#            ddmmyy1=m.group(1)
+#            c1=m.group(2)
+#            ws1=m.group(3)
+#            l = len(ddmmyy1) + len(c1) + len(ws1) #get the length of the figure number and whitespace
+#            return self.raw_text[l:] #return the substring of everything after the figure number
+#        else:
+#            return g.not_found
     
     def get_copyright(self):
         """Returns associated copyright privilege level."""
@@ -163,8 +244,8 @@ class Line:
         targets = ""                        
                     
         for lemma in self.lemmas: #for each noun chunk
-            for key in objectTypeDict:
-                if lemma in objectTypeDict[key]: #xxxTypeDict[key] is a list containing words that map to the term "key"
+            for key in g.objectTypeDict:
+                if lemma in g.objectTypeDict[key]: #xxxTypeDict[key] is a list containing words that map to the term "key"
                     targets += key + ', '
         
         if len(targets) > 2: #targets is a string, not the number of actual matches
@@ -181,11 +262,11 @@ class Line:
         """Returns a guess of what sort of material was used to create the object described in the caption (as unicode)."""
         #### SEE GET_OBJECT_TYPE         
         
-        targets = ""                        
+        targets = ""                       
                     
         for lemma in self.lemmas: #for each noun chunk
-            for key in materialTypeDict:
-                if lemma in materialTypeDict[key]: #xxxTypeDict[key] is a list containing words that map to the term "key"
+            for key in g.materialTypeDict:
+                if lemma in g.materialTypeDict[key]: #xxxTypeDict[key] is a list containing words that map to the term "key"
                     targets += key + ', '
         
         if len(targets) > 2: #targets is a string, not the number of actual matches
@@ -199,8 +280,8 @@ class Line:
         targets = ""                        
                     
         for lemma in self.lemmas: #for each noun chunk
-            for key in docTypeDict:
-                if lemma in docTypeDict[key]: #xxxTypeDict[key] is a list containing words that map to the term "key"
+            for key in g.docTypeDict:
+                if lemma in g.docTypeDict[key]: #xxxTypeDict[key] is a list containing words that map to the term "key"
                     targets += key + ', '
         
         if len(targets) > 2: #targets is a string, not the number of actual matches
@@ -224,41 +305,86 @@ class Line:
 
     def get_creator_role(self):
         """Returns creator's role."""
-        creatorRole = g.not_found
         
-        if self.creator != g.not_found and self.docType != g.not_found: #if there's a doc type and creator
-            creatorRole =  dTypeToRole_map[self.docType]#look up corresponding tuple in doc-->role dictionary
-        return creatorRole
+        return g.not_found
+        
+        ### Below should be debugged. Problem with dTypeToRole_map...
+#        creatorRole = g.not_found
+#        
+#        if self.creator != g.not_found and self.docType != g.not_found: #if there's a doc type and creator
+#            creatorRole =  g.dTypeToRole_map[self.docType]#look up corresponding tuple in doc-->role dictionary
+#        return creatorRole
     
     def get_cultural_term(self):
         """Returns guess of cultural term by comparing chunks to a given dict."""
-        pass #no such dict quite yet
+        return g.not_found
+        #pass #no such dict quite yet
 
     def get_date_type(self):
-        pass
+        return g.not_found
     
     def get_temporal_term(self):
-        pass
+        return g.not_found
     
     def get_geographic_term(self):
-        pass
+        return g.not_found
     
     def get_status(self):
         """Returns status of caption, which, when first uploading, is always 'Needs Review.'"""
         return 'Needs Review.'
         
     def get_permissions(self):
-        pass
+        return g.not_found
+    
+    def get_image_id(self):
+        return g.not_found
     
     def get_image(self):
         """Returns image."""
-        pass #don't have those files on this computer, and wouldn't be able to do much with them anyway...
+        return g.not_found
+        #don't have those files on this computer, and wouldn't be able to do much with them anyway...
         
-    def write_to_file(self):
+    def get_info_for_file(self):
         """Writes out information contained in Line in the order described by the metadata field headers.
         Uses in-cell and between-cell delimiters as defined in globals.py"""
         
-        pass
+        ### Currently have to manually force the printing order. Hoping to fix this..
+        
+        to_be_printed = [self.get_image_id(),
+                        g.book_title,
+                        g.year_published,
+                        g.book_description,
+                        g.editor,
+                        g.publisher,
+                        g.publisher_location,
+                        g.book_doi,
+                        g.book_isbn,
+                        self.get_chapter_num(),
+                        self.get_figure_num(),
+                        self.get_caption(),
+                        self.get_copyright(),
+                        self.get_object_type(),
+                        self.get_material_type(),
+                        self.get_doc_type(),
+                        self.get_creator(),
+                        self.get_creator_role(),
+                        self.get_cultural_term(),
+                        self.get_date_type(),
+                        self.get_temporal_term(),
+                        self.get_geographic_term(),
+                        self.get_status(),
+                        self.get_permissions(),
+                        self.get_image()
+                        ]
+        
+        s = ''
+        
+        for entry in to_be_printed:
+            s = s + entry + g.DELIMITER
+        
+        s = s[:-1] #remove last delimiter
+        
+        return s
 
 #def tree_to_list(t, l):
 #    """Takes in an object that may be a tree, and an empty list l.
@@ -442,124 +568,12 @@ def build_expanded_keywords(l):
 
 
 
-###########################################################
-################## COPYPASTA FROM SAIS SCRIPT #############
-###########################################################
-
-####    HELPER FUNCTIONS    ####
-
-def getWordInQuotes(s):
-    "Takes in a string. Returns a string with the contents of the first word or phrase enveloped in double-quotes."
-    "Returns an empty string if no quotes in string."
-    "(For use with files containing lists of interest.)"
-    "For example, \"I like pie!\" will return the string literal 'I like pie!' (with no '' surrounding it)."
-
-    contents = ""
-    i = j = 0
-
-    if '\"' in s:
-        i = s.find('\"')
-        i += 1 #goes to right after the first quote
-
-    if '\"' in s[i:]: #if another quote in rest of string, get it
-        j = s.rfind('\"')
-        if j == -1: #prevent backslicing if not located
-            j = 0
-
-    if i >= 0 and j > 0:
-        contents = s[i:j]
-
-#    print(i)
-#    print(j)
-#    print(contents)
-
-    return contents
-
-#test = "="
-#print(getWordInQuotes(test))
-
-##### TEST CASES ###
-##
-##extraQuotes = "\"I like pie!\""
-##withoutQuotes = getWordInQuotes(extraQuotes)
-##noQuotes = "I like pie!"
-##
-##print(withoutQuotes)
-##print(extraQuotes)
-##print(noQuotes)
 
 
 
-
-
-
-##############
-######### From Files Containing Controlled Vocabulary #########
-##############
-
-#text files are structured so that the master list of all possible entries starts with a "{". All entries are enclosed in quotes ("").
-#Associations are denoted in the following way: the entry from the master list is written first, followed by an equals sign "=",
-#followed by words that map to this first word, also in quotes.
-#Each newline corresponds to a new masterword being mapped.
-#If there is a line that may cause confusion or otherwise should not be parsed,
-#place at least two backslashes ('\') at the front of the line.
-
-### DICTS in shared.py
-
-objectTypeDict = {}
-materialTypeDict = {}
-docTypeDict = {}
-dTypeToRole_map = {}
-
-def formDictionaryfromFile(d, f):
-    "Takes in a file with lines indicating dictionary values and associated keys. Forms the corresponding dictioary from this file."
-    "The values of the dictionary are lists."
-    "(Specifics as to file format is given in comments above.)"
-
-    lines = f.readlines()
-#    word = ""
-
-    for line in lines:
-        if len(line) >= 2 and line[0:2] == "\\":
-                continue #allow to pass lines if necessary
-#        word = ""
-        
-        unclean_words = line.split()
-        words = unclean_words #want to test line below before including...
-#        words = [g.wnl.lemmatize(word) for word in unclean_words] #use root-words (lemmas) to have to worry less about odd conjugations
-        
-#        print(words)
-        
-        x = 0
-        n = len(words)
-            
-        while x < n:
-#            print(x)
-            s = getWordInQuotes(words[x])
-            if s == "":     #if returns empty string, no "" in word, not one of the desired words
-                words.remove(words[x])
-                n = len(words) #to update the length of list, equivalent to " n -= 1 "
-            else:
-                words[x] = s #otherwise update with non-quoted word
-                x += 1
-
-        #print(words)
 
         
-        if '{' in line and len(d) == 0: #'{' is what's used to recognize it's the line with all the keys
-            for entry in words:
-                d.setdefault(entry,[]).append(entry) #if the caption has the specific word itself, it maps to itself (i.e., a stela is a stela...)
-                #setdefault checks to see if entry is in d (it shouldn't be); if not, it makes d[entry] = []. The append function then adds entry to the newly formed list
-
-        #above if statement should occur before anything else. Use this to check which word to
-
         
-
-        elif '=' in line and len(words) > 0 and words[0] in d.keys():   #'=' is used to recognize it has the words associated to the keys
-            for x in range(1,len(words)):
-                d.setdefault(words[0],[]).append(words[x])
-        
-
 
 #with open("objectType_list.txt", 'r', encoding = 'iso-8859-1') as otl: #object type list
 #        formDictionaryfromFile(objectTypeDict, otl)
@@ -568,7 +582,7 @@ def formDictionaryfromFile(d, f):
 #with open("docType_list.txt", 'r', encoding = 'iso-8859-1') as dtl: #document type list
 #        formDictionaryfromFile(docTypeDict, dtl)
 #with open("docTypetoCreatorRole_map.txt", 'r', encoding = 'utf-8') as dtcrm:
-#    formDictionaryfromFile(dTypeToRole_map, dtcrm)
+# formDictionaryfromFile(dTypeToRole_map, dtcrm)
 
 
 #print(objectTypeDict)
