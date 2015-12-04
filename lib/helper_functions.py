@@ -101,12 +101,14 @@ class Line:
         """Takes in a string. Returns as a string, if existent, the number
         proceeding the string 'Chapter ' in the string."""
         
-        rg = r'(\d+\.\d+\.\d+(\.)*)'
+        rg = r'(\d+\.\d+\.\d+\.?)'
         m = re.search(rg, self.raw_text)        #should only match the digits.digits.digits(.'s) pattern
+        #m.group has ['x.x.xx', and maybe some others...]
         
         if m:
-            rg_beg = r'^(\d+)'
+            rg_beg = r'^(\d+)\.(\d+)'
             mm = re.search(rg_beg, m.group(0)) #m.group(0) is the first and only match of the first part
+            
             
             return mm.group(0)
         else:
@@ -152,12 +154,23 @@ class Line:
 
         #n = l[0] #in current configuration, first word contains all the information
 
-        rg = r'(\d+\.\d+\.\d+?)'
+        rg = r'(\d+\.\d+\.\d+\.?)'
         m = re.search(rg, self.raw_text)        #should only match the digits.digits.digits(.'s) pattern
         
         if m:
-            rg_end = r'(\d+\.\d+)$'
-            mm = re.search(rg_end, m.group(0)) #m.group(0) is the first and only match of the first part
+            rg_end = r'((\d+)(\.)*)$' #searches at end of string for xxx with maybe a dot at the end
+            ss = m.group(0)            
+            mm = re.search(rg_end, ss) #m.group(0) is the first and only match of the first part
+
+            if mm:
+                rg_sss = r'^(\d+)' #searches for just the digits at the front of the substring
+                sss = mm.group(0)   
+                
+                mmm = re.search(rg_sss, sss)
+                
+                if mmm:
+                    return mmm.group(0)
+            
             
             return mm.group(0)
         else:
