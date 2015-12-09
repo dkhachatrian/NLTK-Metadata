@@ -2,6 +2,7 @@
 from nltk.corpus import wordnet as wn
 import nltk
 import os
+import re
 
 REFRESH_NUMBER = 10 #to check if things are still running
 
@@ -16,6 +17,28 @@ materialTypeDict = {}
 docTypeDict = {}
 dTypeToRole_map = {}
 
+
+
+#figure_pattern = (r'(\d+\.\d+\.\d+\.?\s*\w*)', re.VERBOSE)
+
+# in below regexp, can't use \w because \w is alphaNUMERIC; need to match specifically letters...
+rg = r"""(
+    \d+\.\d+   # captures x.x, that all figure captions will have. (Looks like a decimal number though...)
+    (
+    
+    (
+    \.\d+        # the last .x
+    (\.?\s*[a-zA-Z]+)? # may contain a subfigure letter (with some spacing that shouldn't be there...), e.g. 2.4.7 b
+    )
+    
+    |       #either all of the paren'd above if it looks like x.x.xx; or
+          
+    (\s*[a-zA-Z]*)   # a possible subfigure letter if it's eg 1.2a
+    
+    )    
+    )    
+    """
+figure_num_pattern = re.compile(rg, re.VERBOSE)
 
 book_title = not_found
 year_published = not_found
