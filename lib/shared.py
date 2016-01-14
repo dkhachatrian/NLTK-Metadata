@@ -7,9 +7,9 @@ import re
 REFRESH_NUMBER = 10 #to check if things are still running
 
 IGNORE_SEQ = '#' #if at beginning of the line, means not to process it...
-excluded = ['(',')'] #exclude from tags looking for 'NN.'s
+excluded = ['(',')'] #exclude from tags looking for 'NN.'
 not_found = ""
-creator_leading_phrases = ['by', 'courtesy of']
+creator_leading_phrases = ['by', 'courtesy of', 'Photo:', 'Photos:']
 wnl = nltk.WordNetLemmatizer()
 
 objectTypeDict = {}
@@ -18,11 +18,14 @@ docTypeDict = {}
 dTypeToRole_map = {}
 
 
+discriminating_figure_phrases = ['fig', 'fig.', 'table', 'tables'] #use str.lower() on input that is being compared to this list
 
 #figure_pattern = (r'(\d+\.\d+\.\d+\.?\s*\w*)', re.VERBOSE)
 
 # in below regexp, can't use \w because \w is alphaNUMERIC; need to match specifically letters...
 rg = r"""(
+    ^     # only counts as a match if the figure number is at the start of the line (should be enough of a check for most cases...)
+    (
     \d+\.\d+   # captures x.x, that all figure captions will have. (Looks like a decimal number though...)
     (
     
@@ -36,7 +39,8 @@ rg = r"""(
     (\s*[a-zA-Z]*)   # a possible subfigure letter if it's eg 1.2a
     
     )    
-    )    
+    )
+    )
     """
 figure_num_pattern = re.compile(rg, re.VERBOSE)
 
