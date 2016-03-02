@@ -8,6 +8,7 @@ The NLTK Metadata Creator (MC) aims to parse plain-text files for self-contained
 How to Use
 -------------
 To use MC:
+
 1. Download the repository and unzip the folder. Open the newly unzipped directory.
 2. Place in the dependencies folder the file containing the text you would like parsed and name it *Figure Captions.txt*. Replace the mapping files (of the form *\*_type.list.txt*) with your own if desired. **Currently, these files must be the same name as those files listed by default in the dependencies folder.**
 
