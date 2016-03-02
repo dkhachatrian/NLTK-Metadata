@@ -1,7 +1,7 @@
 NLTK Metadata Creator
 ===================
 
-The NLTK Metadata Creator (MC) aims to parse plain-text files for self-contained strings of information (e.g., figure captions) and generate metadata from these strings, according to *user-supplied mappings* or, by default, *using the Natural Language Toolkit[^NLTK]* package for Python..
+The NLTK Metadata Creator (MC) aims to parse plain-text files for self-contained strings of information (e.g., figure captions) and generate metadata from these strings, according to *user-supplied mappings* or, by default, *using the Natural Language Toolkit*[^NLTK] package for Python..
 
 ----------
 
