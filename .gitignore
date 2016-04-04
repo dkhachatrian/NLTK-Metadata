@@ -1,0 +1,7 @@
+*.txt
+*.docx
+outputs
+tests
+__pycache__
+*.pyc
+._*
