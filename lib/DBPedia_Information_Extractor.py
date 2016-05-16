@@ -29,9 +29,22 @@ import spotlight #wrapper for DBPedia Spotlight
 with open(os.path.join(root, 'dependencies', 'test_captions.txt'), 'r', encoding='utf-8') as inf, open(os.path.join(root, 'dependencies', 'test_map.txt'), 'w', encoding='utf-8') as outf:
     for line in inf:
         cl = line.strip("\n")
+        if len(cl) == 0:
+            continue #no data
         annotated = spotlight.annotate('http://spotlight.sztaki.hu:2222/rest/annotate', cl, confidence=0.4, support=20, spotter='Default')
         
+        outf.write("The original line is as follows: \n")
+        outf.write(cl + '\n\n')
+        outf.write("The information obtained from DBPedia Spotlight follows: \n\n")
         
+        if type(annotated) == list:
+            for element in annotated:
+                outf.write(str(element))
+                outf.write('\n') #spacing
+        else: #just a dict
+            outf.write(str(annotated))
+            
+        outf.write('\n\n\n') #spacing
         
         time.sleep(1) #wait a second between each call
                 
