@@ -58,6 +58,8 @@ class Line:
         self.lemmas = self.get_lemmas()
         self.creator = self.get_creator()
         self.docType = self.get_doc_type()
+        self.objectType = ''
+        self.materialType = ''
         
     def get_raw_text(self):
         """Returns raw text."""
@@ -182,6 +184,40 @@ class Line:
         """Returns associated copyright privilege level."""
         #unless I get some file explaining the permissions, let's pass...
         return g.not_found
+    
+    
+    def get_type(self):
+        """Gets each noun. Sees if it exists in any of the current dictionaries. Otherwise, asks user."""
+        nouns = self.get_nouns(self)
+        dicts = [g.objectTypeDict, g.docTypeDict, g.materialTypeDict]
+        types = [self.objectType, self.docType, self.materialType]
+        leftover_nouns = []
+        is_matched = False
+        for noun in nouns:
+            is_matched = False
+            for n,d in enumerate(dicts): #provides a pair of (0,dict0),(1,dict1), etc
+                if noun in d:
+                    print("The script has found a match in the " + d[noun][0] + "dictionary where " + noun + "maps to " + d[noun][1] ". The two have been matched together " +d[noun][2] + " times. The line in which the current token has been matched is shown below: ")
+                    print('\n\n' + self.get_raw_text() + '\n\n')
+                    response = input("Would you like to make the match of " + noun + "to " + d[noun][1] "? (Y/N)")
+                    if response == 'Y' or response == 'y':
+                        is_matched = True
+                        types[n] = d[noun][1]
+                        # TODO: ask to put into permanent map?
+                    else if response == 'N' or response == 'n':
+                        #leftover_nouns.append(noun)
+                        print("Skipping...\n\n\n")
+                
+                if not is_matched:
+                    leftover_nouns.append(noun)
+        
+        for noun in leftover_nouns:
+            pass
+            # TODO: ask user which category to put into (or leave blank if not a word of interest), which controlled vocabulary to match it to. Update appropriate dict
+        
+        
+    
+    
     
     def get_object_type(self):
         """Given the string, returns a guess of what type of object is being described in the caption (as unicode)."""

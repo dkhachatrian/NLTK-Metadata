@@ -12,6 +12,7 @@ not_found = ""
 creator_leading_phrases = ['by', 'courtesy of', 'Photo:', 'Photos:']
 wnl = nltk.WordNetLemmatizer()
 
+# (word from captions) -> (categoryType, controlled vocabulary word, number of times matched)
 objectTypeDict = {}
 materialTypeDict = {}
 docTypeDict = {}
